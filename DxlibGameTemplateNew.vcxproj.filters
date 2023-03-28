@@ -54,16 +54,16 @@
     <ClCompile Include="Util\Pad.cpp">
       <Filter>ソース ファイル\Util</Filter>
     </ClCompile>
-    <ClCompile Include="Player.cpp">
+    <ClCompile Include="Object\Player.cpp">
       <Filter>ソース ファイル\Object</Filter>
     </ClCompile>
-    <ClCompile Include="Enemy.cpp">
+    <ClCompile Include="Object\Enemy.cpp">
       <Filter>ソース ファイル\Object</Filter>
     </ClCompile>
-    <ClCompile Include="BattleEffects.cpp">
+    <ClCompile Include="Object\BattleEffects.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Map.cpp">
+    <ClCompile Include="Object\Map.cpp">
       <Filter>ソース ファイル\Object</Filter>
     </ClCompile>
   </ItemGroup>
@@ -89,16 +89,16 @@
     <ClInclude Include="Util\Pad.h">
       <Filter>ヘッダー ファイル\Util</Filter>
     </ClInclude>
-    <ClInclude Include="Player.h">
+    <ClInclude Include="Object\Player.h">
       <Filter>ヘッダー ファイル\Object</Filter>
     </ClInclude>
-    <ClInclude Include="Enemy.h">
+    <ClInclude Include="Object\Enemy.h">
       <Filter>ヘッダー ファイル\Object</Filter>
     </ClInclude>
-    <ClInclude Include="BattleEffects.h">
+    <ClInclude Include="Object\BattleEffects.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Map.h">
+    <ClInclude Include="Object\Map.h">
       <Filter>ヘッダー ファイル\Object</Filter>
     </ClInclude>
   </ItemGroup>

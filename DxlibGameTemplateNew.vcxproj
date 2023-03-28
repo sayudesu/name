@@ -164,11 +164,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="BattleEffects.cpp" />
-    <ClCompile Include="Enemy.cpp" />
+    <ClCompile Include="Object\BattleEffects.cpp" />
+    <ClCompile Include="Object\Enemy.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Map.cpp" />
-    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Object\Map.cpp" />
+    <ClCompile Include="Object\Player.cpp" />
     <ClCompile Include="Scene\SceneBase.cpp" />
     <ClCompile Include="Scene\SceneMain.cpp" />
     <ClCompile Include="Scene\SceneManager.cpp" />
@@ -177,11 +177,11 @@
     <ClCompile Include="Util\Vec2.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BattleEffects.h" />
-    <ClInclude Include="Enemy.h" />
+    <ClInclude Include="Object\BattleEffects.h" />
+    <ClInclude Include="Object\Enemy.h" />
     <ClInclude Include="game.h" />
-    <ClInclude Include="Map.h" />
-    <ClInclude Include="Player.h" />
+    <ClInclude Include="Object\Map.h" />
+    <ClInclude Include="Object\Player.h" />
     <ClInclude Include="Scene\SceneBase.h" />
     <ClInclude Include="Scene\SceneMain.h" />
     <ClInclude Include="Scene\SceneManager.h" />
