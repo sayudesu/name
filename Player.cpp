@@ -22,14 +22,13 @@ Player::Player() :
 	m_playerImageLetf(0), m_playerImageTop(0),//プレイヤーの画像位置
 	m_playerAnimationCut_X(0), m_playerAnimationCut_Y(0),////プレイヤー画像のX軸動きによって調整
 	m_playerAnimationFrameCount(0),//アニメーション再生カウント
+	m_MapMove_X(0),//マップの位置
 	m_playerSpeed(0.0f),//プレイヤーの移動速度
 	m_isPlayerDirection(false),//プレイヤーの向き false 右 : true	左 
 	m_isAttackAnimation(false),//攻撃した場合のアニメーション
 	m_isGuardAnimation(false),//攻撃を防ぐアニメーション
 	m_playerPos(0.0f, 0.0f),//プレイヤーの位置
-	m_playerVec(0.0f, 0.0f),//プレイヤーの運動量
-	m_hMap(-1),
-	m_MapMove_X(0)
+	m_playerVec(0.0f, 0.0f)//プレイヤーの運動量
 {
 
 }
@@ -45,13 +44,11 @@ void Player::Init()
 	m_playerPos.y = Game::kScreenHeight / 2;
 
 	m_hPlayer = LoadGraph(kPlayer);//画像のメモリ確保
-	m_hMap = LoadGraph("Data/Image/Map/Hills Layer 05.png");
 }
 void Player::End()
 {
 	//メモリ解放
 	DeleteGraph(m_hPlayer);
-	DeleteGraph(m_hMap);
 }
 
 //キャラクターを操作
@@ -81,9 +78,10 @@ void Player::PlayerMovement()
 
 		m_isPlayerDirection = true;//方向を変更 左向き
 		m_attackLeftPos = -110;
+		if(m_MapMove_X < 10000)
 		if (m_playerPos.x < 500)
 		{
-			m_MapMove_X += 20;
+			m_MapMove_X += kPlayerSpeed * 3;
 		}
 
 	}
@@ -96,9 +94,12 @@ void Player::PlayerMovement()
 
 		m_isPlayerDirection = false;//方向を変更 右向き
 		m_attackLeftPos = 60;
-		if (m_playerPos.x > Game::kScreenWidth - 500)
+		if (m_MapMove_X > -10000)
 		{
-			m_MapMove_X -= 20;
+			if (m_playerPos.x > Game::kScreenWidth - 500)
+			{
+				m_MapMove_X -= kPlayerSpeed * 3;
+			}
 		}
 	}
 	if (Pad::isPress(PAD_INPUT_5))//下
@@ -106,7 +107,7 @@ void Player::PlayerMovement()
 		m_playerAnimationCut_X = 4;
 		m_playerAnimationCut_Y = 3;
 	}
-
+	printfDx("%d\n", m_MapMove_X);
 
 	if (Pad::isTrigger(PAD_INPUT_1))//攻撃
 	{
@@ -198,7 +199,6 @@ void Player::Update()
 
 void Player::Draw()
 {
-	DrawExtendGraph(-10000 + m_MapMove_X, -100, Game::kScreenWidth + 10000 + m_MapMove_X, Game::kScreenHeight, m_hMap, false);
 	//プレイヤーアニメーション描画
 	DrawRectRotaGraph(static_cast<int>(m_playerPos.x), static_cast<int>(m_playerPos.y),
 		m_playerImageLetf, m_playerImageTop, kPlayerImageSize, kPlayerImageSize,

@@ -9,6 +9,7 @@ namespace
 class Player;//プレイヤークラス
 class Enemy;//エネミークラス
 class BattleEffects;//エフェクトクラス
+class Map;//マップクラス
 
 class SceneMain : public SceneBase
 {
@@ -26,4 +27,5 @@ private:
 	Player* m_pPlayer[kHitNum];//プレイヤークラス
 	Enemy* m_pEnemy[kHitNum];//エネミークラス
 	BattleEffects* m_pEffects[kHitNum];//エフェクトクラス
+	Map* m_pMap;//マップクラス
 };

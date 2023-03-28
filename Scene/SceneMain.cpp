@@ -3,12 +3,15 @@
 #include "Player.h"
 #include "Enemy.h"
 #include "BattleEffects.h"
+#include "Map.h"
 
 SceneMain::SceneMain():
 	m_pPlayer(),//プレイヤークラス
 	m_pEnemy(),//エネミークラス
-	m_pEffects()//エフェクトクラス
+	m_pEffects(),//エフェクトクラス
+	m_pMap(nullptr)//マップクラス
 {
+
 	//メモリ確保
 	for (int i = 0; i < kHitNum; i++)
 	{
@@ -16,6 +19,8 @@ SceneMain::SceneMain():
 		m_pEnemy[i] = new Enemy;
 		m_pEffects[i] = new BattleEffects;
 	}
+
+	m_pMap = new Map;
 }
 
 SceneMain::~SceneMain()
@@ -27,6 +32,7 @@ SceneMain::~SceneMain()
 		delete m_pEnemy[i];
 		delete m_pEffects[i];
 	}
+	delete m_pMap;
 }
 
 void SceneMain::Init()
@@ -38,6 +44,7 @@ void SceneMain::Init()
 		m_pEnemy[i]->Init();
 		m_pEffects[i]->Init();
 	}
+	m_pMap->Init();
 }
 void SceneMain::End()
 {
@@ -48,6 +55,7 @@ void SceneMain::End()
 		m_pEnemy[i]->End();
 		m_pEffects[i]->End();
 	}
+	m_pMap->End();
 }
 
 SceneBase* SceneMain::Update()
@@ -55,7 +63,7 @@ SceneBase* SceneMain::Update()
 
 	m_pEnemy[0]->Update();
 	m_pPlayer[0]->Update();
-
+	m_pMap->Update();
 	//プレイヤーとエネミーの当たり判定
 	if ((m_pPlayer[0]->SetRightPos() > m_pEnemy[0]->SetLeftPos()) &&
 		(m_pPlayer[0]->SetLeftPos() < m_pEnemy[0]->SetRightPos()))
@@ -73,6 +81,7 @@ SceneBase* SceneMain::Update()
 
 void SceneMain::Draw()
 {
+	m_pMap->Draw(m_pPlayer[0]->SetMapPosX());
 	m_pPlayer[0]->Draw();
 	m_pEnemy[0]->Draw();
 	m_pEffects[0]->Draw();
