@@ -2,7 +2,7 @@
 #include "game.h"
 #include "Scene/SceneManager.h"
 
-#define  Draw false;
+#define  DRAW false;
 
 // プログラムは WinMain から始まります
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -22,7 +22,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 	// ダブルバッファモード
 	SetDrawScreen(DX_SCREEN_BACK);
-#if Draw
+#if DRAW
 	//Zバッファを有効にする
 	SetUseZBuffer3D(true);
 	//Zバッファへの書き込みを行う
@@ -49,7 +49,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 #endif
 	// 最初のシーンの初期化
 	SceneManager scene;
-	scene.init();
+	scene.Init();
 
 	while (ProcessMessage() == 0)
 	{
@@ -57,9 +57,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		// 画面のクリア
 		ClearDrawScreen();
 
-		scene.update();
-		scene.draw();
-#if Draw
+		scene.Update();
+		scene.Draw();
+
+#if DRAW
 		for (float z = -1000.0f; z <= 1000.0f; z += 100.0f)
 		{
 			VECTOR start = VGet(-1000, 0.0f, z);
@@ -135,7 +136,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		}
 	}
 
-	scene.end();
+	scene.End();
 
 	DxLib_End();				// ＤＸライブラリ使用の終了処理
 

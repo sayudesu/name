@@ -7,13 +7,10 @@ public:
 	SceneBase() {}
 	virtual ~SceneBase() {}
 
-	virtual void init() {}
-	virtual void end() {}
+	virtual void Init() {}
+	virtual void End() {}
 
-	virtual SceneBase* update() { return this; }
-	virtual void draw() {}
-
-	// ƒV[ƒ“I—¹
-	virtual bool isEnd() { return false; }
+	virtual SceneBase* Update() { return this; }
+	virtual void Draw() {}
 };
 

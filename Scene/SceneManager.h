@@ -8,13 +8,13 @@ public:
 	SceneManager();
 	virtual ~SceneManager() {}
 	// 初期化
-	void init();
+	void Init();
 	// 終了
-	void end();
+	void End();
 	// 毎フレームの処理
-	void update();
+	void Update();
 	// 描画
-	void draw();
+	void Draw();
 
 private:
 	// シーンベースポインタ
