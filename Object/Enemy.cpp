@@ -22,7 +22,7 @@ void Enemy::End()
 void Enemy::Update()
 {
 	m_enemyLeft = Game::kScreenWidth / 2;
-	m_enemyTop = Game::kScreenHeight / 2;
+	m_enemyTop = Game::kScreenHeight / 2 + 100;
 	m_enemyRight = m_enemyLeft + 100;
 	m_enemyBottom = m_enemyTop + 200;
 }

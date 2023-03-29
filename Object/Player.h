@@ -11,14 +11,17 @@ public:
 	virtual void End();
 
 	virtual void PlayerMovement();//キャラクターを操作
+	virtual void PlayerAnimation();//アニメーション処理
+	virtual void PlayerAttackScope();//攻撃範囲
 	virtual void PlayerMoveScope();//プレイヤーの行動範囲
 
-	virtual void Update();
-	virtual void Draw();
+	virtual void Update();//更新処理
+	virtual void Draw();//描画処理
 public:
-	int SetLeftPos() { return m_attackLeft; }
+	//pプレイヤーの攻撃範囲
+	int SetLeftPos() { return m_attackLeft; }//左上
 	int SetTopPos() { return m_attackTop; }
-	int SetRightPos() { return m_attackRight; }
+	int SetRightPos() { return m_attackRight; }//右下
 	int SetBottomPos() { return m_attackBottom; }
 	int SetMapPosX() { return m_MapMove_X; }
 private:
@@ -28,6 +31,7 @@ private:
 	int m_playerImageLetf, m_playerImageTop;//プレイヤーの画像位置
 	int m_playerAnimationCut_X, m_playerAnimationCut_Y;//プレイヤー画像のX軸動きによって調整
 	int m_playerAnimationFrameCount;//アニメーション再生カウント
+	int m_playerAnimationFrameCountNextNum;//アニメーション再生するための数
 	int m_MapMove_X;//マップの位置
 	float m_playerSpeed;//プレイヤーの移動速度
 	bool m_isPlayerDirection;//プレイヤーの向き false 右 : true	左
