@@ -3,7 +3,7 @@
 
 UserInterface::UserInterface():
 	m_staminaNum(0),//プレイヤーのスタミナ
-	m_healthNum(100)//プレイヤーの体力
+	m_healthNum(0)//プレイヤーの体力
 {
 }
 

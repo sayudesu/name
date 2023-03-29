@@ -29,7 +29,8 @@ Player::Player() :
 	m_playerAnimationCut_X(0), m_playerAnimationCut_Y(0),////プレイヤー画像のX軸動きによって調整
 	m_playerAnimationFrameCount(0),m_playerAnimationFrameCountNextNum(0),//アニメーション再生カウント//アニメーション再生するための数
 	m_mapMove_X(0),//マップの位置
-	m_staminaNum(0.0f),
+	m_staminaNum(0.0f),//スタミナを管理
+	m_healthNum(0.0f),//体力を管理
 	m_playerSpeed(0.0f),//プレイヤーの移動速度
 	m_isPlayerDirection(false),//プレイヤーの向き false 右 : true	左 
 	m_isAttackAnimation(false),//攻撃した場合のアニメーション
@@ -52,6 +53,7 @@ void Player::Init()
 	m_hPlayer = my::MyLoadGraph(kPlayer);//画像のメモリ確保
 
 	m_staminaNum = 100.0f;//スタミナ
+	m_healthNum = 100.0f;//体力
 }
 void Player::End()
 {
@@ -271,7 +273,11 @@ void Player::PlayerStaminaControl()
 	else m_isRun = true;//走れる
 
 	//スタミナの下限
-	if (m_staminaNum < 0.0f)m_staminaNum = 0.0f;
+	if (m_staminaNum < 0.0f)
+	{
+		m_staminaNum = 0.0f;
+		m_healthNum -= 0.1f;
+	}
 }
 
 //更新処理

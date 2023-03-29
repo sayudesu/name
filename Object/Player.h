@@ -29,6 +29,8 @@ public:
 	
 	//プレイヤーのスタミナ
 	float SetStaminaNum() { return m_staminaNum; }
+	//プレイヤーの体力
+	float SethealthNum() { return m_healthNum; }
 
 private:
 	int m_hPlayer;//プレイヤー画像
@@ -40,6 +42,7 @@ private:
 	int m_playerAnimationFrameCountNextNum;//アニメーション再生するための数
 	int m_mapMove_X;//マップの位置
 	float m_staminaNum;//スタミナを管理
+	float m_healthNum;//体力を管理
 	float m_playerSpeed;//プレイヤーの移動速度
 	bool m_isPlayerDirection;//プレイヤーの向き false 右 : true	左
 	bool m_isAttackAnimation;//攻撃した場合のアニメーション

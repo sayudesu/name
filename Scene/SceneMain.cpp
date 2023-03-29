@@ -84,7 +84,7 @@ SceneBase* SceneMain::Update()
 		}
 	}
 	
-//	m_pUi->GetHealthNum();
+	m_pUi->GetHealthNum(m_pPlayer[0]->SethealthNum());
 	m_pUi->GetStaminaNum(m_pPlayer[0]->SetStaminaNum());
 
 	return this;
