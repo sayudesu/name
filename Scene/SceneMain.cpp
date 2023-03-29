@@ -81,8 +81,8 @@ SceneBase* SceneMain::Update()
 
 void SceneMain::Draw()
 {
-	m_pMap->Draw(m_pPlayer[0]->SetMapPosX());
-	m_pPlayer[0]->Draw();
-	m_pEnemy[0]->Draw();
-	m_pEffects[0]->Draw();
+	m_pMap->Draw(m_pPlayer[0]->SetMapPosX());//マップ描画
+	m_pEnemy[0]->Draw();//エネミー描画
+	m_pPlayer[0]->Draw();//プレイヤー描画
+	m_pEffects[0]->Draw();//攻撃エフェクト描画
 }
