@@ -1,6 +1,7 @@
 #include <DxLib.h>
 #include "game.h"
 #include "Pad.h"
+#include "DrawFunctions.h"
 #include "Player.h"
 
 namespace
@@ -39,16 +40,14 @@ Player::~Player()
 
 void Player::Init()
 {
+	m_playerPos = { Game::kScreenWidth / 2 ,Game::kScreenHeight / 2 };
 
-	m_playerPos.x = Game::kScreenWidth / 2;
-	m_playerPos.y = Game::kScreenHeight / 2;
-
-	m_hPlayer = LoadGraph(kPlayer);//画像のメモリ確保
+	m_hPlayer = my::MyLoadGraph(kPlayer);//画像のメモリ確保
 }
 void Player::End()
 {
 	//メモリ解放
-	DeleteGraph(m_hPlayer);
+	my::MyDeleteGraph(m_hPlayer);
 }
 
 //キャラクターを操作
@@ -78,10 +77,12 @@ void Player::PlayerMovement()
 
 		m_isPlayerDirection = true;//方向を変更 左向き
 		m_attackLeftPos = -110;
-		if(m_MapMove_X < 10000)
-		if (m_playerPos.x < 500)
+		if (m_MapMove_X < 10000)
 		{
-			m_MapMove_X += kPlayerSpeed * 3;
+			if (m_playerPos.x < 500)
+			{
+				m_MapMove_X += kPlayerSpeed * 3;
+			}
 		}
 
 	}
@@ -177,7 +178,7 @@ void Player::Update()
 	}
 
 	m_playerAnimationFrameCount++;//アニメーション再生カウント
-	if (m_playerAnimationFrameCount >= 3)
+	if (m_playerAnimationFrameCount >= 4)
 	{
 		m_playerAnimationFrameCount = KinitialValue;
 		m_playerImageTop = kPlayerImageSize * m_playerAnimationCut_Y;//Y軸をずらす
@@ -200,10 +201,10 @@ void Player::Update()
 void Player::Draw()
 {
 	//プレイヤーアニメーション描画
-	DrawRectRotaGraph(static_cast<int>(m_playerPos.x), static_cast<int>(m_playerPos.y),
+	my::MyDrawRectRotaGraph(static_cast<int>(m_playerPos.x), static_cast<int>(m_playerPos.y),
 		m_playerImageLetf, m_playerImageTop, kPlayerImageSize, kPlayerImageSize,
 		1.5 * 3, DX_PI * 2, m_hPlayer, true, m_isPlayerDirection);
-
+	
 	//攻撃範囲可視化
 	DrawBox(m_attackLeft, m_attackTop, m_attackRight, m_attackBottom,0xffff00,true);
 }

@@ -1,5 +1,5 @@
-#include <Dxlib.h>
 #include "game.h"
+#include "DrawFunctions.h"
 #include "Map.h"
 
 Map::Map():
@@ -13,12 +13,12 @@ Map::~Map()
 
 void Map::Init()
 {
-	m_hMap = LoadGraph("Data/Image/Map/Hills Layer 05.png");
+	m_hMap = my::MyLoadGraph("Data/Image/Map/Hills Layer 05.png");
 }
 
 void Map::End()
 {
-	DeleteGraph(m_hMap);
+	my::MyDeleteGraph(m_hMap);
 }
 
 void Map::Update()
@@ -27,5 +27,6 @@ void Map::Update()
 
 void Map::Draw(int x)
 {
-	DrawExtendGraph(-10000 + x, -100, Game::kScreenWidth + 10000 + x, Game::kScreenHeight, m_hMap, false);
+	//ƒ}ƒbƒv‚ð•`‰æ
+	my::MyDrawExtendGraph(-10000 + x, 0, Game::kScreenWidth + 10000 + x, Game::kScreenHeight, m_hMap, false);
 }

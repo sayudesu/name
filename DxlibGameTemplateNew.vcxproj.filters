@@ -66,6 +66,9 @@
     <ClCompile Include="Object\Map.cpp">
       <Filter>ソース ファイル\Object</Filter>
     </ClCompile>
+    <ClCompile Include="Object\DrawFunctions.cpp">
+      <Filter>ソース ファイル\Object</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h">
@@ -100,6 +103,9 @@
     </ClInclude>
     <ClInclude Include="Object\Map.h">
       <Filter>ヘッダー ファイル\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\DrawFunctions.h">
+      <Filter>ソース ファイル\Object</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

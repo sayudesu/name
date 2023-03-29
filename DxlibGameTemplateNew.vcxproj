@@ -165,6 +165,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Object\BattleEffects.cpp" />
+    <ClCompile Include="Object\DrawFunctions.cpp" />
     <ClCompile Include="Object\Enemy.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Object\Map.cpp" />
@@ -178,6 +179,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Object\BattleEffects.h" />
+    <ClInclude Include="Object\DrawFunctions.h" />
     <ClInclude Include="Object\Enemy.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="Object\Map.h" />
