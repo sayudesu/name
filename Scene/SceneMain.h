@@ -10,6 +10,7 @@ class Player;//プレイヤークラス
 class Enemy;//エネミークラス
 class BattleEffects;//エフェクトクラス
 class Map;//マップクラス
+class UserInterface;//UIクラス
 
 class SceneMain : public SceneBase
 {
@@ -28,4 +29,6 @@ private:
 	Enemy* m_pEnemy[kHitNum];//エネミークラス
 	BattleEffects* m_pEffects[kHitNum];//エフェクトクラス
 	Map* m_pMap;//マップクラス
+	UserInterface* m_pUi;//UIクラス
+
 };

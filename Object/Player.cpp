@@ -15,6 +15,10 @@ namespace
 	constexpr float kAcc = 0.3f;//プレイヤーの加速度
 	constexpr float kPlayerMaxSpeed = 6.0f;//プレイヤーのスピード
 
+	constexpr float kStaminaMax = 100.0f;//スタミナ最大数
+	constexpr float kStaminaCharge = 0.20f;//スタミナ回復
+	constexpr float kStaminaFall = 0.30f;//スタミナ減少
+
 }
 
 Player::Player() :
@@ -24,11 +28,13 @@ Player::Player() :
 	m_playerImageLetf(0), m_playerImageTop(0),//プレイヤーの画像位置
 	m_playerAnimationCut_X(0), m_playerAnimationCut_Y(0),////プレイヤー画像のX軸動きによって調整
 	m_playerAnimationFrameCount(0),m_playerAnimationFrameCountNextNum(0),//アニメーション再生カウント//アニメーション再生するための数
-	m_MapMove_X(0),//マップの位置
+	m_mapMove_X(0),//マップの位置
+	m_staminaNum(0.0f),
 	m_playerSpeed(0.0f),//プレイヤーの移動速度
 	m_isPlayerDirection(false),//プレイヤーの向き false 右 : true	左 
 	m_isAttackAnimation(false),//攻撃した場合のアニメーション
 	m_isGuardAnimation(false),//攻撃を防ぐアニメーション
+	m_isRun(false),//走れるかどうか
 	m_playerPos(0.0f, 0.0f),//プレイヤーの位置
 	m_playerVec(0.0f, 0.0f)//プレイヤーの運動量
 {
@@ -44,6 +50,8 @@ void Player::Init()
 	m_playerPos = { static_cast<float>(Game::kScreenWidth / 2 + 20) ,static_cast<float>(Game::kScreenHeight / 2  + 200)};
 
 	m_hPlayer = my::MyLoadGraph(kPlayer);//画像のメモリ確保
+
+	m_staminaNum = 100.0f;//スタミナ
 }
 void Player::End()
 {
@@ -55,7 +63,7 @@ void Player::End()
 void Player::PlayerMovement()
 {
 	Pad::update();
-
+#if false
 	//プレイヤーの移動
 	if (Pad::isPress(PAD_INPUT_UP))//上
 	{
@@ -74,7 +82,7 @@ void Player::PlayerMovement()
 	{
 		m_playerVec.y *= 0.9f;
 	}
-
+#endif
 	if (Pad::isPress(PAD_INPUT_LEFT))//左
 	{
 		m_playerVec.x -= kAcc;//運動量を代入
@@ -91,9 +99,9 @@ void Player::PlayerMovement()
 
 		if (m_playerPos.x < 500)
 		{
-			if (m_MapMove_X < 10000)
+			if (m_mapMove_X < 10000)
 			{
-				m_MapMove_X += kPlayerMaxSpeed * 1;
+				m_mapMove_X += kPlayerMaxSpeed * 1;
 			}
 		}
 	}
@@ -113,9 +121,9 @@ void Player::PlayerMovement()
 
 		if (m_playerPos.x > Game::kScreenWidth - 500)
 		{
-			if (m_MapMove_X > -10000)
+			if (m_mapMove_X > -10000)
 			{
-				m_MapMove_X -= kPlayerMaxSpeed * 1;
+				m_mapMove_X -= kPlayerMaxSpeed * 1;
 			}
 		}
 	}
@@ -124,21 +132,26 @@ void Player::PlayerMovement()
 		m_playerVec.x *= 0.9f;
 	}
 
-	if (Pad::isPress(PAD_INPUT_5))//走り
+	if (m_isRun)//スタミナしだい
 	{
-		m_playerAnimationCut_X = 4;
-		m_playerAnimationCut_Y = 3;
+		if (Pad::isPress(PAD_INPUT_5))//走り
+		{
+			m_playerAnimationCut_X = 4;
+			m_playerAnimationCut_Y = 3;
 
-		//向いている方向に対して高速移動
-		if (m_isPlayerDirection)
-		{
-			m_playerVec.x -= 0.3f;
-			m_MapMove_X += kPlayerMaxSpeed + 3.0f;
-		}
-		else
-		{
-			m_playerVec.x += 0.3f;
-			m_MapMove_X -= kPlayerMaxSpeed + 3.0f;
+			m_staminaNum -= kStaminaFall;//スタミナ減少
+
+			//向いている方向に対して高速移動
+			if (m_isPlayerDirection)
+			{
+				m_playerVec.x -= 0.3f;
+				m_mapMove_X += kPlayerMaxSpeed + 3.0f;
+			}
+			else
+			{
+				m_playerVec.x += 0.3f;
+				m_mapMove_X -= kPlayerMaxSpeed + 3.0f;
+			}
 		}
 	}
 
@@ -153,17 +166,22 @@ void Player::PlayerMovement()
 	{
 		m_playerAnimationCut_X = 9;
 		m_playerAnimationCut_Y = 2;
+
+		m_staminaNum -= kStaminaFall;//スタミナ減少
 	}
 	if (Pad::isTrigger(PAD_INPUT_3))//ガード
 	{
 		m_isGuardAnimation = true;//攻撃した場合のアニメーション再生
 		m_playerImageLetf = 0;
 		m_playerSpeed = 0;
+
 	}
 	if (m_isGuardAnimation)//攻撃を防ぐアニメーション
 	{
 		m_playerAnimationCut_X = 8;
 		m_playerAnimationCut_Y = 4;
+
+		m_staminaNum -= kStaminaFall;//スタミナ減少
 	}
 
 }
@@ -228,7 +246,7 @@ void Player::PlayerMoveScope()
 	{
 		m_playerPos.x = Game::kScreenWidth - 500;
 	}
-	printfDx("%d\n", m_MapMove_X);
+
 	//上移動の上限
 	if (m_playerPos.y < 0)
 	{
@@ -239,6 +257,21 @@ void Player::PlayerMoveScope()
 	{
 		m_playerPos.y = Game::kScreenHeight;
 	}
+}
+
+//スタミナ管理
+void Player::PlayerStaminaControl()
+{
+	//スタミナの上限
+	if (m_staminaNum < kStaminaMax)m_staminaNum += kStaminaCharge;
+	//プレイヤーの動きを遅くする
+	if (m_staminaNum <= 30.0f)m_playerAnimationFrameCountNextNum = 7;
+	//走りを無効かする
+	if (m_staminaNum <= 25.0f)m_isRun = false;//走れない
+	else m_isRun = true;//走れる
+
+	//スタミナの下限
+	if (m_staminaNum < 0.0f)m_staminaNum = 0.0f;
 }
 
 //更新処理
@@ -265,6 +298,7 @@ void Player::Update()
 		//m_playerAnimationFrameCountNextNum = 4;
 	}
 
+	PlayerStaminaControl();//スタミナ管理
 	PlayerAnimation();//アニメーション処理
 
 	m_playerPos += m_playerVec;//移動量

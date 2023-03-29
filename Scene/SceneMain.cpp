@@ -4,12 +4,15 @@
 #include "Enemy.h"
 #include "BattleEffects.h"
 #include "Map.h"
+#include "UserInterface.h"
 
 SceneMain::SceneMain():
 	m_pPlayer(),//プレイヤークラス
 	m_pEnemy(),//エネミークラス
 	m_pEffects(),//エフェクトクラス
-	m_pMap(nullptr)//マップクラス
+	m_pMap(nullptr),//マップクラス
+	m_pUi(nullptr)//UIクラス
+
 {
 
 	//メモリ確保
@@ -21,6 +24,7 @@ SceneMain::SceneMain():
 	}
 
 	m_pMap = new Map;
+	m_pUi = new UserInterface;
 }
 
 SceneMain::~SceneMain()
@@ -33,6 +37,7 @@ SceneMain::~SceneMain()
 		delete m_pEffects[i];
 	}
 	delete m_pMap;
+	delete m_pUi;
 }
 
 void SceneMain::Init()
@@ -45,6 +50,7 @@ void SceneMain::Init()
 		m_pEffects[i]->Init();
 	}
 	m_pMap->Init();
+	m_pUi->Init();
 }
 void SceneMain::End()
 {
@@ -64,6 +70,8 @@ SceneBase* SceneMain::Update()
 	m_pEnemy[0]->Update();
 	m_pPlayer[0]->Update();
 	m_pMap->Update();
+	m_pUi->Update();
+
 	//プレイヤーとエネミーの当たり判定
 	if ((m_pPlayer[0]->SetRightPos() > m_pEnemy[0]->SetLeftPos()) &&
 		(m_pPlayer[0]->SetLeftPos() < m_pEnemy[0]->SetRightPos()))
@@ -76,6 +84,9 @@ SceneBase* SceneMain::Update()
 		}
 	}
 	
+//	m_pUi->GetHealthNum();
+	m_pUi->GetStaminaNum(m_pPlayer[0]->SetStaminaNum());
+
 	return this;
 }
 
@@ -84,5 +95,6 @@ void SceneMain::Draw()
 	m_pMap->Draw(m_pPlayer[0]->SetMapPosX());//マップ描画
 	m_pEnemy[0]->Draw();//エネミー描画
 	m_pPlayer[0]->Draw();//プレイヤー描画
+	m_pUi->Draw();//UIを描画
 	m_pEffects[0]->Draw();//攻撃エフェクト描画
 }
