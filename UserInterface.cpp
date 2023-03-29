@@ -15,6 +15,10 @@ void UserInterface::Init()
 {
 }
 
+void UserInterface::End()
+{
+}
+
 void UserInterface::Update()
 {
 	
