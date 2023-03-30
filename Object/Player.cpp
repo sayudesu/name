@@ -33,7 +33,7 @@ Player::Player() :
 	m_healthNum(0.0f),//体力を管理
 	m_playerSpeed(0.0f),//プレイヤーの移動速度
 	m_isPlayerDirection(false),//プレイヤーの向き false 右 : true	左 
-	m_isAttackAnimation(false),//攻撃した場合のアニメーション
+	m_isAttackAnimation(false),m_isAttackRunAnimation(false),//攻撃した場合のアニメーション
 	m_isGuardAnimation(false),//攻撃を防ぐアニメーション
 	m_isRun(false),//走れるかどうか
 	m_playerPos(0.0f, 0.0f),//プレイヤーの位置
@@ -134,6 +134,8 @@ void Player::PlayerMovement()
 		m_playerVec.x *= 0.9f;
 	}
 
+	m_isAttackRunAnimation = false;//走り攻撃の範囲を指定しない
+
 	if (m_isRun)//スタミナしだい
 	{
 		if (Pad::isPress(PAD_INPUT_5))//走り
@@ -142,6 +144,8 @@ void Player::PlayerMovement()
 			m_playerAnimationCut_Y = 3;
 
 			m_staminaNum -= kStaminaFall;//スタミナ減少
+
+			m_isAttackRunAnimation = true;//走り攻撃の範囲を指定する
 
 			//向いている方向に対して高速移動
 			if (m_isPlayerDirection)
@@ -214,6 +218,7 @@ void Player::PlayerAnimation()
 //攻撃範囲
 void Player::PlayerAttackScope()
 {
+	//通常攻撃
 	if (m_isAttackAnimation)//攻撃範囲
 	{
 		if (m_playerImageLetf > kPlayerImageSize * 6 &&//攻撃アニメーションの攻撃部分
@@ -232,6 +237,34 @@ void Player::PlayerAttackScope()
 			m_attackRight = 0;
 			m_attackBottom = 0;
 		}
+	}
+	//突進攻撃
+	if (m_isAttackRunAnimation)
+	{
+		if (m_playerImageLetf > kPlayerImageSize * 0 &&//攻撃アニメーションの攻撃部分
+			m_playerImageLetf < kPlayerImageSize * 4)
+		{
+			//攻撃位置
+			m_attackLeft = m_playerPos.x + m_attackLeftPos;//左上,右向きか左向きかで攻撃位置を変更
+			m_attackTop = m_playerPos.y + 20;
+			m_attackRight = m_attackLeft + 50;//右下
+			m_attackBottom = m_attackTop + 50;
+		}
+		else
+		{
+			m_attackLeft = 0;
+			m_attackTop = 0;
+			m_attackRight = 0;
+			m_attackBottom = 0;
+		}
+	}
+	
+	if(!m_isAttackAnimation && !m_isAttackRunAnimation)//攻撃してない場合の処理
+	{
+		m_attackLeft = 0;
+		m_attackTop = 0;
+		m_attackRight = 0;
+		m_attackBottom = 0;
 	}
 }
 
@@ -276,7 +309,7 @@ void Player::PlayerStaminaControl()
 	if (m_staminaNum < 0.0f)
 	{
 		m_staminaNum = 0.0f;
-		m_healthNum -= 0.1f;
+		m_healthNum -= 0.1f;//スタミナがなくなると体力が減少
 	}
 }
 

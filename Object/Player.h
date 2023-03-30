@@ -46,6 +46,7 @@ private:
 	float m_playerSpeed;//プレイヤーの移動速度
 	bool m_isPlayerDirection;//プレイヤーの向き false 右 : true	左
 	bool m_isAttackAnimation;//攻撃した場合のアニメーション
+	bool m_isAttackRunAnimation;//走り状態で攻撃した場合のアニメーション
 	bool m_isGuardAnimation;//攻撃を防ぐアニメーション
 	bool m_isRun;//走れるかどうか
 	Vec2 m_playerPos;//プレイヤーの位置

@@ -30,6 +30,7 @@ namespace
 	constexpr float kTextureMaxV = kTextureMinV + 1.0f / kTextureDivNumY_F;
 }
 
+//グリッド描画
 void DrawGrid()
 {
 	for (float z = -1000.0f; z <= 1000.0f; z += 100.0f)
@@ -63,12 +64,12 @@ void DrawMapPolygon(VECTOR  pos,float size,int textrure)
 	VERTEX3D polyVtx[vtxNum]{};
 
 	//左上
-	polyVtx[0].pos = VGet(-size/ 2.0f, size/ 2.0f, 0.0f);
+	polyVtx[0].pos = VGet(-size/ 2.0f, size/ 2.0f, -size / 2.0f);
 	polyVtx[0].norm = VGet(0.0f, 0.0f, -1.0f);
 	polyVtx[0].dif = GetColorU8(255, 255, 255, 255);
 	polyVtx[0].spc = GetColorU8(255, 255, 255, 255);
-	polyVtx[0].u = 0.0f;
-	polyVtx[0].v = 0.0f;
+	polyVtx[0].u = kTextureMinU;
+	polyVtx[0].v = kTextureMinV;
 	polyVtx[0].su = 0.0f;
 	polyVtx[0].sv = 0.0f;
 
@@ -107,7 +108,7 @@ void DrawMapPolygon(VECTOR  pos,float size,int textrure)
 	}
 
 
-	DrawPolygon3D(polyVtx, 2, textrure, false);
+	//DrawPolygon3D(polyVtx, 2, textrure, false);
 
 	//回転行列
 	MATRIX mtx = MGetRotY(DX_PI_F / 2.0f);
@@ -205,8 +206,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 #else
 	// 最初のシーンの初期化
-	SceneManager scene;
-	scene.Init();
+	SceneManager* scene;
+	scene = new SceneManager;
+	scene->Init();
 #endif
 	while (ProcessMessage() == 0)
 	{
@@ -241,11 +243,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		SetCameraPositionAndTarget_UpVecY(cameraPos, VGet(0,0,0));//カメラの位置　カメラの注視点( 見ている座標 )
 
 		DrawGrid();
-		DrawMapPolygon(VGet(0.0f, 0.0f, 0.0f),200.0f,texture);
+
+		DrawMapPolygon(VGet(200.0f, 0.0f, 0.0f),200.0f,texture);
+
+		//DrawMapPolygon(VGet(200.0f, 0.0f, 0.0f), 200.0f, texture);
+		//DrawMapPolygon(VGet(200.0f, 0.0f, 0.0f), 200.0f, texture);
 
 #else
-		scene.Update();
-		scene.Draw();
+		scene->Update();
+		scene->Draw();
 #endif
 		//裏画面を表画面を入れ替える
 		ScreenFlip();
@@ -261,7 +267,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 #if DRAW
 	DeleteGraph(texture);
 #else
-	scene.End();
+	scene->End();
 #endif
 
 	// ＤＸライブラリ使用の終了処理

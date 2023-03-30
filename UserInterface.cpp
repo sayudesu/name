@@ -1,5 +1,5 @@
-#include "UserInterface.h"
 #include <DxLib.h>
+#include "UserInterface.h"
 
 UserInterface::UserInterface():
 	m_staminaNum(0),//プレイヤーのスタミナ
