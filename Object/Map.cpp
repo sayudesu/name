@@ -3,7 +3,7 @@
 #include "Map.h"
 
 Map::Map():
-	m_hMap(-1)
+	m_hMap(-1)//マップ画像用
 {
 }
 
@@ -13,11 +13,13 @@ Map::~Map()
 
 void Map::Init()
 {
+	//マップ画像メモリ読み込み
 	m_hMap = my::MyLoadGraph("Data/Image/Map/Hills Layer 05.png");
 }
 
 void Map::End()
 {
+	//メモリ開放
 	my::MyDeleteGraph(m_hMap);
 }
 
