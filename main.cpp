@@ -1,8 +1,9 @@
-#include "DxLib.h"
+ï»¿#include <DxLib.h>
 #include "game.h"
 #include "Scene/SceneManager.h"
 
 #define  DRAW false;
+#define td true;
 
 #if DRAW
 
@@ -11,180 +12,180 @@
 
 namespace
 {
-	//Œ´“_‚©‚çƒJƒƒ‰‚Ü‚Å‚Ì‹——£
+	//åŸç‚¹ã‹ã‚‰ã‚«ãƒ¡ãƒ©ã¾ã§ã®è·é›¢
 	constexpr int kCameraDistance = 800.0f;
 
-	//ƒeƒNƒXƒ`ƒƒî•ñ
+	//ãƒ†ã‚¯ã‚¹ãƒãƒ£æƒ…å ±a
 	const char* const kTextureFilename = "texture01.png";
 
-	//ƒ}ƒbƒvƒ`ƒbƒv‚Ì•ªŠ„”ij
+	//ãƒãƒƒãƒ—ãƒãƒƒãƒ—ã®åˆ†å‰²æ•°ï¼ˆï¼‰
 	constexpr float kTextureDivNumX_F = 11.0f;
 	constexpr float kTextureDivNumY_F = 8.0f;
-	//g—p‚·‚éƒ`ƒbƒv‚Ì”Ô†(‰¡ˆÊ’uAcˆÊ’u‚ğw’è‚·‚é)
+	//ä½¿ç”¨ã™ã‚‹ãƒãƒƒãƒ—ã®ç•ªå·(æ¨ªä½ç½®ã€ç¸¦ä½ç½®ã‚’æŒ‡å®šã™ã‚‹)
 	constexpr int kUseTexture_X = 8;
 	constexpr int kUseTexture_Y = 3;
-	//g—p‚·‚éƒ`ƒbƒv‚ÌƒeƒNƒXƒ`ƒƒÀ•W
+	//ä½¿ç”¨ã™ã‚‹ãƒãƒƒãƒ—ã®ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™
 	constexpr float kTextureMinU = 1.0f / kTextureDivNumX_F * kUseTexture_X;
 	constexpr float kTextureMaxU = kTextureMinU + 1.0f / kTextureDivNumX_F;
 	constexpr float kTextureMinV = 1.0f / kTextureDivNumY_F * kUseTexture_Y;
 	constexpr float kTextureMaxV = kTextureMinV + 1.0f / kTextureDivNumY_F;
 }
 
-//ƒOƒŠƒbƒh•`‰æ
-void DrawGrid()
-{
-	for (float z = -1000.0f; z <= 1000.0f; z += 100.0f)
-	{
-		VECTOR start = VGet(-1000, 0.0f, z);
-		VECTOR end = VGet(1000, 0.0f, z);
-		DrawLine3D(start, end, 0xffff00);
-	}
-
-	for (float x = -1000.0f; x <= 1000.0f; x += 100.0f)
-	{
-		VECTOR start = VGet(x, 0.0f, -1000.0f);
-		VECTOR end = VGet(x, 0.0f, 1000.0f);
-		DrawLine3D(start, end, 0xffff00);
-	}
-}
-
-//ƒ}ƒbƒv‚ğ\¬‚·‚é—§•û‘Ì‚Ì1–Ê‚ğ•\¦
-//Œ´“_‚ğ’†S‚Æ‚µ‚Äz-•ûŒü‚ğŒü‚¢‚½•½–Ê‚ğ•`‰æ
-
-//w’èˆÊ’u‚ğ’†S‚Æ‚µ‚Ä‚½w’èƒTƒCƒY‚Ì—§•û‘Ì‚ğ•\¦‚·‚’
-void DrawMapPolygon(VECTOR  pos,float size,int textrure)
-{
-	//ƒ|ƒŠƒSƒ“‚Ì•`‰æ
-	constexpr int polyNum = 2;//³•ûŒ`‚P–Ê•`‰æ‚·‚é‚Ì‚É•K—v‚Èƒ|ƒŠƒSƒ“‚Ì”
-	constexpr int vtxNum = polyNum * 3;//ƒ|ƒŠƒSƒ“‚Ì‚P–Ê•ª‚Ì•`‰æ‚É•K—v‚È’¸“_”
-	constexpr int cubeVtxNum = polyNum * 6;//—§•û‘Ì‚P‚Â‚Ì•`‰æ‚·‚é‚Ì‚É•K—v‚È’¸“_”
-
-	std::vector<VERTEX3D> drawVtx; //•`‰æ‚É‚µ‚æ‚¤‚·‚é’¸“_ƒf[ƒ^
-
-	VERTEX3D polyVtx[vtxNum]{};
-
-	//¶ã
-	polyVtx[0].pos = VGet(-size/ 2.0f, size/ 2.0f, -size / 2.0f);
-	polyVtx[0].norm = VGet(0.0f, 0.0f, -1.0f);
-	polyVtx[0].dif = GetColorU8(255, 255, 255, 255);
-	polyVtx[0].spc = GetColorU8(255, 255, 255, 255);
-	polyVtx[0].u = kTextureMinU;
-	polyVtx[0].v = kTextureMinV;
-	polyVtx[0].su = 0.0f;
-	polyVtx[0].sv = 0.0f;
-
-	//0”Ô–Ú‚Ì’¸“_‚Ìî•ñ‚ğˆÈ~‚Ì’¸“_‚ÉƒRƒs[‚·‚é
-	for (int i = 0; i < vtxNum; i++)
-	{
-		polyVtx[i] = polyVtx[0];
-	}
-
-	//‰Eã
-	polyVtx[1].pos = VGet(size, 200.0f, 0.0f);
-	polyVtx[1].u = kTextureMaxU;
-	polyVtx[1].v = kTextureMinU;
-	//¶‰º
-	polyVtx[2].pos = VGet(-200.0f, -200.0f, 0.0f);
-	polyVtx[2].u = kTextureMinU;
-	polyVtx[2].v = kTextureMaxU;
-
-	//‰E‰º
-	polyVtx[3].pos = VGet(200.0f, -200.0f, 0.0f);
-	polyVtx[3].u = kTextureMaxU;
-	polyVtx[3].v = kTextureMinU;
-	//¶‰º
-	polyVtx[4].pos = VGet(-200.0f, -200.0f, 0.0f);
-	polyVtx[4].u = kTextureMinU;
-	polyVtx[4].v = kTextureMaxU;
-	//‰Eã
-	polyVtx[5].pos = VGet(200.0f, 200.0f, 0.0f);
-	polyVtx[5].u = kTextureMaxU;
-	polyVtx[5].v = kTextureMinU;
-
-	//•`‰æ‚Ì’¸“_ƒf[ƒ^‚É“o˜^
-	for (auto& vtx : polyVtx)
-	{
-		drawVtx.push_back(vtx);
-	}
-
-
-	//DrawPolygon3D(polyVtx, 2, textrure, false);
-
-	//‰ñ“]s—ñ
-	MATRIX mtx = MGetRotY(DX_PI_F / 2.0f);
-	//‘¤–Ê‚Ì’¸“_ƒf[ƒ^¶¬A“o˜^
-	for (int i = 0; i < 3; i++)
-	{
-		for (auto& vtx : polyVtx)
-		{
-			vtx.pos = VTransform(polyVtx[i].pos, mtx);
-			vtx.norm = VTransform(polyVtx[i].norm, mtx);
-			drawVtx.push_back(vtx);
-		}
-	}
-	//ã–Ê‚Ì’¸“_ƒf[ƒ^¶¬A“o˜^
-	mtx = MGetRotZ(DX_PI_F / 2.0f);
-	for (int i = 0; i < 3; i++)
-	{
-		for (auto& vtx : polyVtx)
-		{
-			vtx.pos = VTransform(polyVtx[i].pos, mtx);
-			vtx.norm = VTransform(polyVtx[i].norm, mtx);
-			drawVtx.push_back(vtx);
-		}
-	}
-	//‰º–Ê‚Ì’¸“_ƒf[ƒ^¶¬A“o˜^
-	mtx = MGetRotZ(DX_PI_F / 2.0f);
-	for (int i = 0; i < 3; i++)
-	{
-		for (auto& vtx : polyVtx)
-		{
-			vtx.pos = VTransform(polyVtx[i].pos, mtx);
-			vtx.norm = VTransform(polyVtx[i].norm, mtx);
-			drawVtx.push_back(vtx);
-		}
-	}
-	for (auto& vtx : drawVtx)
-	{
-		vtx.pos = VAdd(vtx.pos, pos);
-	}
-
-	DrawPolygon3D(drawVtx.data(), drawVtx.size()/3, textrure, false);
-}
+//ã‚°ãƒªãƒƒãƒ‰æç”»
+//////////////////////void DrawGrid()
+//////////////////////{
+//////////////////////	for (float z = -1000.0f; z <= 1000.0f; z += 100.0f)
+//////////////////////	{
+//////////////////////		VECTOR start = VGet(-1000, 0.0f, z);
+//////////////////////		VECTOR end = VGet(1000, 0.0f, z);
+//////////////////////		DrawLine3D(start, end, 0xffff00);
+//////////////////////	}
+//////////////////////
+//////////////////////	for (float x = -1000.0f; x <= 1000.0f; x += 100.0f)
+//////////////////////	{
+//////////////////////		VECTOR start = VGet(x, 0.0f, -1000.0f);
+//////////////////////		VECTOR end = VGet(x, 0.0f, 1000.0f);
+//////////////////////		DrawLine3D(start, end, 0xffff00);
+//////////////////////	}
+//////////////////////}
+//
+////ãƒãƒƒãƒ—ã‚’æ§‹æˆã™ã‚‹ç«‹æ–¹ä½“ã®1é¢ã‚’è¡¨ç¤º
+////åŸç‚¹ã‚’ä¸­å¿ƒã¨ã—ã¦z-æ–¹å‘ã‚’å‘ã„ãŸå¹³é¢ã‚’æç”»
+//
+////æŒ‡å®šä½ç½®ã‚’ä¸­å¿ƒã¨ã—ã¦ãŸæŒ‡å®šã‚µã‚¤ã‚ºã®ç«‹æ–¹ä½“ã‚’è¡¨ç¤ºã™ï½’
+//void DrawMapPolygon(VECTOR  pos,float size,int textrure)
+//{
+//	//ãƒãƒªã‚´ãƒ³ã®æç”»
+//	constexpr int polyNum = 2;//æ­£æ–¹å½¢ï¼‘é¢æç”»ã™ã‚‹ã®ã«å¿…è¦ãªãƒãƒªã‚´ãƒ³ã®æ•°
+//	constexpr int vtxNum = polyNum * 3;//ãƒãƒªã‚´ãƒ³ã®ï¼‘é¢åˆ†ã®æç”»ã«å¿…è¦ãªé ‚ç‚¹æ•°
+//	constexpr int cubeVtxNum = polyNum * 6;//ç«‹æ–¹ä½“ï¼‘ã¤ã®æç”»ã™ã‚‹ã®ã«å¿…è¦ãªé ‚ç‚¹æ•°
+//
+//	std::vector<VERTEX3D> drawVtx; //æç”»ã«ã—ã‚ˆã†ã™ã‚‹é ‚ç‚¹ãƒ‡ãƒ¼ã‚¿
+//
+//	VERTEX3D polyVtx[vtxNum]{};
+//
+//	//å·¦ä¸Š
+//	polyVtx[0].pos = VGet(-size/ 2.0f, size/ 2.0f, -size / 2.0f);
+//	polyVtx[0].norm = VGet(0.0f, 0.0f, -1.0f);
+//	polyVtx[0].dif = GetColorU8(255, 255, 255, 255);
+//	polyVtx[0].spc = GetColorU8(255, 255, 255, 255);
+//	polyVtx[0].u = kTextureMinU;
+//	polyVtx[0].v = kTextureMinV;
+//	polyVtx[0].su = 0.0f;
+//	polyVtx[0].sv = 0.0f;
+//
+//	//0ç•ªç›®ã®é ‚ç‚¹ã®æƒ…å ±ã‚’ä»¥é™ã®é ‚ç‚¹ã«ã‚³ãƒ”ãƒ¼ã™ã‚‹
+//	for (int i = 0; i < vtxNum; i++)
+//	{
+//		polyVtx[i] = polyVtx[0];
+//	}
+//
+//	//å³ä¸Š
+//	polyVtx[1].pos = VGet(size, 200.0f, 0.0f);
+//	polyVtx[1].u = kTextureMaxU;
+//	polyVtx[1].v = kTextureMinU;
+//	//å·¦ä¸‹
+//	polyVtx[2].pos = VGet(-200.0f, -200.0f, 0.0f);
+//	polyVtx[2].u = kTextureMinU;
+//	polyVtx[2].v = kTextureMaxU;
+//
+//	//å³ä¸‹
+//	polyVtx[3].pos = VGet(200.0f, -200.0f, 0.0f);
+//	polyVtx[3].u = kTextureMaxU;
+//	polyVtx[3].v = kTextureMinU;
+//	//å·¦ä¸‹
+//	polyVtx[4].pos = VGet(-200.0f, -200.0f, 0.0f);
+//	polyVtx[4].u = kTextureMinU;
+//	polyVtx[4].v = kTextureMaxU;
+//	//å³ä¸Š
+//	polyVtx[5].pos = VGet(200.0f, 200.0f, 0.0f);
+//	polyVtx[5].u = kTextureMaxU;
+//	polyVtx[5].v = kTextureMinU;
+//
+//	//æç”»ã®é ‚ç‚¹ãƒ‡ãƒ¼ã‚¿ã«ç™»éŒ²
+//	for (auto& vtx : polyVtx)
+//	{
+//		drawVtx.push_back(vtx);
+//	}
+//
+//
+//	//DrawPolygon3D(polyVtx, 2, textrure, false);
+//
+//	//å›è»¢è¡Œåˆ—
+//	MATRIX mtx = MGetRotY(DX_PI_F / 2.0f);
+//	//å´é¢ã®é ‚ç‚¹ãƒ‡ãƒ¼ã‚¿ç”Ÿæˆã€ç™»éŒ²
+//	for (int i = 0; i < 3; i++)
+//	{
+//		for (auto& vtx : polyVtx)
+//		{
+//			vtx.pos = VTransform(polyVtx[i].pos, mtx);
+//			vtx.norm = VTransform(polyVtx[i].norm, mtx);
+//			drawVtx.push_back(vtx);
+//		}
+//	}
+//	//ä¸Šé¢ã®é ‚ç‚¹ãƒ‡ãƒ¼ã‚¿ç”Ÿæˆã€ç™»éŒ²
+//	mtx = MGetRotZ(DX_PI_F / 2.0f);
+//	for (int i = 0; i < 3; i++)
+//	{
+//		for (auto& vtx : polyVtx)
+//		{
+//			vtx.pos = VTransform(polyVtx[i].pos, mtx);
+//			vtx.norm = VTransform(polyVtx[i].norm, mtx);
+//			drawVtx.push_back(vtx);
+//		}
+//	}
+//	//ä¸‹é¢ã®é ‚ç‚¹ãƒ‡ãƒ¼ã‚¿ç”Ÿæˆã€ç™»éŒ²
+//	mtx = MGetRotZ(DX_PI_F / 2.0f);
+//	for (int i = 0; i < 3; i++)
+//	{
+//		for (auto& vtx : polyVtx)
+//		{
+//			vtx.pos = VTransform(polyVtx[i].pos, mtx);
+//			vtx.norm = VTransform(polyVtx[i].norm, mtx);
+//			drawVtx.push_back(vtx);
+//		}
+//	}
+//	for (auto& vtx : drawVtx)
+//	{
+//		vtx.pos = VAdd(vtx.pos, pos);
+//	}
+//
+//	DrawPolygon3D(drawVtx.data(), drawVtx.size()/3, textrure, false);
+//}
 
 #endif
-
-// ƒvƒƒOƒ‰ƒ€‚Í WinMain ‚©‚çn‚Ü‚è‚Ü‚·
+#if td
+// ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¯ WinMain ã‹ã‚‰å§‹ã¾ã‚Šã¾ã™
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-	// windowƒ‚[ƒhİ’è
+	// windowãƒ¢ãƒ¼ãƒ‰è¨­å®š
 	ChangeWindowMode(Game::kWindowMode);
-	// ƒEƒCƒ“ƒhƒE–¼İ’è
+	// ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦åè¨­å®š
 	SetMainWindowText(Game::kTitleText);
-	//ƒ}ƒEƒXƒJ[ƒ\ƒ‹•\¦
+	//ãƒã‚¦ã‚¹ã‚«ãƒ¼ã‚½ãƒ«è¡¨ç¤º
 	SetMouseDispFlag(Game::kMouseMode);
-	// ‰æ–ÊƒTƒCƒY‚Ìİ’è
+	// ç”»é¢ã‚µã‚¤ã‚ºã®è¨­å®š
 	SetGraphMode(Game::kScreenWidth, Game::kScreenHeight, Game::kColorDepth);
 
-	if (DxLib_Init() == -1)		// ‚c‚wƒ‰ƒCƒuƒ‰ƒŠ‰Šú‰»ˆ—
+	if (DxLib_Init() == -1)		// ï¼¤ï¼¸ãƒ©ã‚¤ãƒ–ãƒ©ãƒªåˆæœŸåŒ–å‡¦ç†
 	{
-		return -1;			// ƒGƒ‰[‚ª‹N‚«‚½‚ç’¼‚¿‚ÉI—¹
+		return -1;			// ã‚¨ãƒ©ãƒ¼ãŒèµ·ããŸã‚‰ç›´ã¡ã«çµ‚äº†
 	}
-	// ƒ_ƒuƒ‹ƒoƒbƒtƒ@ƒ‚[ƒh
+	// ãƒ€ãƒ–ãƒ«ãƒãƒƒãƒ•ã‚¡ãƒ¢ãƒ¼ãƒ‰
 	SetDrawScreen(DX_SCREEN_BACK);
 #if DRAW
-	//Zƒoƒbƒtƒ@‚ğ—LŒø‚É‚·‚é
+	//Zãƒãƒƒãƒ•ã‚¡ã‚’æœ‰åŠ¹ã«ã™ã‚‹
 	SetUseZBuffer3D(true);
-	//Zƒoƒbƒtƒ@‚Ö‚Ì‘‚«‚İ‚ğs‚¤
+	//Zãƒãƒƒãƒ•ã‚¡ã¸ã®æ›¸ãè¾¼ã¿ã‚’è¡Œã†
 	SetWriteZBuffer3D(true);
-	//— –Êƒ|ƒŠƒSƒ“‚ğ•\¦‚µ‚È‚¢
+	//è£é¢ãƒãƒªã‚´ãƒ³ã‚’è¡¨ç¤ºã—ãªã„
 	SetUseBackCulling(false);
 
-	//ƒJƒƒ‰”ÍˆÍ
+	//ã‚«ãƒ¡ãƒ©ç¯„å›²
 	SetCameraNearFar(5.0f, 2000.0f);
 	//FOV
 	
-	//ƒJƒƒ‰ˆÊ’u•‚Ç‚±‚ğŒ©‚Ä‚¢‚é‚©
+	//ã‚«ãƒ¡ãƒ©ä½ç½®ï¼†ã©ã“ã‚’è¦‹ã¦ã„ã‚‹ã‹
 	SetCameraPositionAndTarget_UpVecY(VGet(0, 300, -800), VGet(0, 0, 0));
 
 	float posX = 0;
@@ -195,17 +196,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	float eyeY = 0;
 	float eyeZ = 0;
 
-	//’†S‚©‚çŒ©‚½ƒJƒƒ‰‚Ì•ûŒü
+	//ä¸­å¿ƒã‹ã‚‰è¦‹ãŸã‚«ãƒ¡ãƒ©ã®æ–¹å‘
 	float cameraAngle = 0.0f;
 
 	//VECTOR spherePos = VGet(0.0f, 0.0f, 0.0f);
-	//‹–ìŠp
+	//è¦–é‡è§’
 	float pers = 60.0f;
 
 	int texture = LoadGraph(kTextureFilename);
 
 #else
-	// Å‰‚ÌƒV[ƒ“‚Ì‰Šú‰»
+	// æœ€åˆã®ã‚·ãƒ¼ãƒ³ã®åˆæœŸåŒ–
 	SceneManager* scene;
 	scene = new SceneManager;
 	scene->Init();
@@ -213,7 +214,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	while (ProcessMessage() == 0)
 	{
 		LONGLONG  time = GetNowHiPerformanceCount();
-		// ‰æ–Ê‚ÌƒNƒŠƒA
+		// ç”»é¢ã®ã‚¯ãƒªã‚¢
 		ClearDrawScreen();
 
 #if DRAW
@@ -240,7 +241,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		VECTOR cameraPos = VGet(0.0f,300.0f,0.0f);
 		cameraPos.x = sinf(cameraAngle) * kCameraDistance;
 		cameraPos.z = cosf(cameraAngle) * kCameraDistance;
-		SetCameraPositionAndTarget_UpVecY(cameraPos, VGet(0,0,0));//ƒJƒƒ‰‚ÌˆÊ’u@ƒJƒƒ‰‚Ì’‹“_( Œ©‚Ä‚¢‚éÀ•W )
+		SetCameraPositionAndTarget_UpVecY(cameraPos, VGet(0,0,0));//ã‚«ãƒ¡ãƒ©ã®ä½ç½®ã€€ã‚«ãƒ¡ãƒ©ã®æ³¨è¦–ç‚¹( è¦‹ã¦ã„ã‚‹åº§æ¨™ )
 
 		DrawGrid();
 
@@ -253,13 +254,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		scene->Update();
 		scene->Draw();
 #endif
-		//— ‰æ–Ê‚ğ•\‰æ–Ê‚ğ“ü‚ê‘Ö‚¦‚é
+		//è£ç”»é¢ã‚’è¡¨ç”»é¢ã‚’å…¥ã‚Œæ›¿ãˆã‚‹
 		ScreenFlip();
 
-		// escƒL[‚ğ‰Ÿ‚µ‚½‚çI—¹‚·‚é
+		// escã‚­ãƒ¼ã‚’æŠ¼ã—ãŸã‚‰çµ‚äº†ã™ã‚‹
 		if (CheckHitKey(KEY_INPUT_ESCAPE))	break;
 
-		// fps‚ğ60‚ÉŒÅ’è
+		// fpsã‚’60ã«å›ºå®š
 		while (GetNowHiPerformanceCount() - time < 16667)
 		{
 		}
@@ -270,9 +271,413 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	scene->End();
 #endif
 
-	// ‚c‚wƒ‰ƒCƒuƒ‰ƒŠg—p‚ÌI—¹ˆ—
+	// ï¼¤ï¼¸ãƒ©ã‚¤ãƒ–ãƒ©ãƒªä½¿ç”¨ã®çµ‚äº†å‡¦ç†
 	DxLib_End();
 	
 
-	return 0;				// ƒ\ƒtƒg‚ÌI—¹ 
+	return 0;				// ã‚½ãƒ•ãƒˆã®çµ‚äº† 
 }
+#else
+
+// æŒ‡å®šä½ç½®ã‚’ä¸­å¿ƒã¨ã—ãŸæŒ‡å®šã‚µã‚¤ã‚ºã®ç«‹æ–¹ä½“ã‚’è¡¨ç¤ºã™ã‚‹
+void DrawMapPolygon(VECTOR pos, float size, int texture)
+{
+	constexpr int polyNum = 2;//æ­£æ–¹å½¢ï¼‘é¢æç”»ã™ã‚‹ã®ã«å¿…è¦ãªãƒãƒªã‚´ãƒ³ã®æ•°
+	constexpr int vtxNum = polyNum * 3;//ãƒãƒªã‚´ãƒ³ï¼‘é¢åˆ†ã®æç”»ã«å¿…è¦ãªé ‚ç‚¹æ•°
+	constexpr int cuveVtxNum = vtxNum * 6;//ç«‹æ–¹ä½“1ã¤æç”»ã™ã‚‹ã®ã«å¿…è¦ãªè¶…ç‚¹æ•°
+
+
+
+	std::vector<VERTEX3D> drawVtx; //æç”»ã«ä½¿ç”¨ã™ã‚‹é ‚ç‚¹ãƒ‡ãƒ¼ã‚¿
+
+
+
+	VERTEX3D polyVtx[vtxNum];
+
+
+
+	//å·¦ä¸Š
+	polyVtx[0].pos = VGet(-size / 2.0f, size / 2.0f, -size / 2.0f);
+	polyVtx[0].norm = VGet(0.0f, 0.0f, -1.0f);
+	polyVtx[0].dif = GetColorU8(255, 255, 255, 255);
+	polyVtx[0].spc = GetColorU8(255, 255, 255, 255);
+	polyVtx[0].u = kTextureMinU;
+	polyVtx[0].v = kTextureMinV;
+	polyVtx[0].su = 0.0f;
+	polyVtx[0].sv = 0.0f;
+
+
+
+	//0ç•ªç›®ã®é ‚ç‚¹ã®æƒ…å ±ã‚’ä»¥é™ã®é ‚ç‚¹ã«ã‚³ãƒ”ãƒ¼ã™ã‚‹
+	for (int i = 1; i < vtxNum; i++) {
+		polyVtx[i] = polyVtx[0];
+	}
+
+
+
+	//å³ä¸Š
+	polyVtx[1].pos = VGet(size / 2.0f, size / 2.0f, -size / 2.0f);
+	polyVtx[1].u = kTextureMaxU;
+	polyVtx[1].v = kTextureMinV;
+	//å·¦ä¸‹
+	polyVtx[2].pos = VGet(-size / 2.0f, -size / 2.0f, -size / 2.0f);
+	polyVtx[2].u = kTextureMinU;
+	polyVtx[2].v = kTextureMaxV;
+	//å³ä¸‹
+	polyVtx[3].pos = VGet(size / 2.0f, -size / 2.0f, -size / 2.0f);
+	polyVtx[3].u = kTextureMaxU;
+	polyVtx[3].v = kTextureMaxV;
+	//å·¦ä¸‹
+	polyVtx[4].pos = VGet(-size / 2.0f, -size / 2.0f, -size / 2.0f);
+	polyVtx[4].u = kTextureMinU;
+	polyVtx[4].v = kTextureMaxV;
+	//å³ä¸Š
+	polyVtx[5].pos = VGet(size / 2.0f, size / 2.0f, -size / 2.0f);
+	polyVtx[5].u = kTextureMaxU;
+	polyVtx[5].v = kTextureMinV;
+
+
+
+	//æç”»ã®é ‚ç‚¹ãƒ‡ãƒ¼ã‚¿ã«ç™»éŒ²
+	for (auto& vtx : polyVtx) {
+		drawVtx.push_back(vtx);
+	}
+
+
+
+	//å›è»¢è¡Œåˆ—
+	MATRIX mtx = MGetRotY(DX_PI_F / 2.0f);
+	//å´é¢ã®é ‚ç‚¹ãƒ‡ãƒ¼ã‚¿ç”Ÿæˆã€ç™»éŒ²
+	for (int i = 0; i < 3; i++) {
+		for (auto& vtx : polyVtx) {
+			vtx.pos = VTransform(vtx.pos, mtx);
+			vtx.norm = VTransform(vtx.norm, mtx);
+			drawVtx.push_back(vtx);
+		}
+	}
+
+
+
+	mtx = MGetRotZ(DX_PI_F / 2.0f);
+	for (auto& vtx : polyVtx) {
+		vtx.pos = VTransform(vtx.pos, mtx);
+		vtx.norm = VTransform(vtx.norm, mtx);
+		drawVtx.push_back(vtx);
+	}
+
+
+
+	mtx = MGetRotZ(DX_PI_F);
+	for (auto& vtx : polyVtx) {
+		vtx.pos = VTransform(vtx.pos, mtx);
+		vtx.norm = VTransform(vtx.norm, mtx);
+		drawVtx.push_back(vtx);
+	}
+
+
+
+	//æœ€å¾Œã«ä½ç½®æƒ…å ±ã‚’è¶³ã™
+	for (auto& vtx : drawVtx) {
+		vtx.pos = VAdd(vtx.pos, pos);
+	}
+
+
+
+	DrawPolygon3D(drawVtx.data(), static_cast<int>(drawVtx.size() / 3), texture, true);
+}
+
+// ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¯ WinMain ã‹ã‚‰å§‹ã¾ã‚Šã¾ã™
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+{
+	// windowãƒ¢ãƒ¼ãƒ‰è¨­å®š
+	ChangeWindowMode(Game::kWindowMode);
+	// ã‚¦ã‚¤ãƒ³ãƒ‰ã‚¦åè¨­å®š
+	SetMainWindowText(Game::kTitleText);
+	// ç”»é¢ã‚µã‚¤ã‚ºã®è¨­å®š
+	SetGraphMode(Game::kScreenWidth, Game::kScreenHeight, Game::kColorDepth);
+
+
+
+
+	if (DxLib_Init() == -1)// ï¼¤ï¼¸ãƒ©ã‚¤ãƒ–ãƒ©ãƒªåˆæœŸåŒ–å‡¦ç†
+	{
+		return -1;// ã‚¨ãƒ©ãƒ¼ãŒèµ·ããŸã‚‰ç›´ã¡ã«çµ‚äº†
+	}
+
+
+
+	// ãƒ€ãƒ–ãƒ«ãƒãƒƒãƒ•ã‚¡ãƒ¢ãƒ¼ãƒ‰
+	SetDrawScreen(DX_SCREEN_BACK);
+	// Zãƒãƒƒãƒ•ã‚¡ã‚’æœ‰åŠ¹ã«ã™ã‚‹
+	SetUseZBuffer3D(true);
+	// Zãƒãƒƒãƒ•ã‚¡ã¸ã®æ›¸ãè¾¼ã¿ã‚’è¡Œã†
+	SetWriteZBuffer3D(true);
+
+
+
+	// è£å´ãƒãƒªã‚´ãƒ³ã‚’è¡¨ç¤ºã—ãªã„
+	SetUseBackCulling(true);
+
+
+
+	// ã‚«ãƒ¡ãƒ©ã®è¨­å®š
+	SetCameraNearFar(5.0f, 3000.0f);
+	SetupCamera_Perspective(60.0f * DX_PI_F / 180.0f);
+	SetCameraPositionAndTarget_UpVecY(VGet(0.0f, 0.0f, 0.0f), VGet(0.0f, 0.0f, 0.0f));
+
+	// ãƒãƒ†ãƒªã‚¢ãƒ«è¨­å®š
+	MATERIALPARAM Material{};
+	Material.Diffuse = GetColorF(1.0f, 1.0f, 1.0f, 1.0f);
+	Material.Specular = GetColorF(1.0f, 1.0f, 1.0f, 1.0f);
+	Material.Ambient = GetColorF(1.0f, 1.0f, 1.0f, 1.0f);// ã‚¢ãƒ³ãƒ“ã‚¨ãƒ³ãƒˆãƒ©ã‚¤ãƒˆã‚’åå°„ã•ã›ã‚‹
+	Material.Emissive = GetColorF(0.0f, 0.0f, 0.0f, 0.0f);
+	Material.Power = 20.0f;
+	SetMaterialParam(Material);
+
+
+
+	// çƒã®ä½ç½®
+	VECTOR spherePos = VGet(0.0f, 200.0f, 0.0f);
+	// ä¸­å¿ƒã‹ã‚‰è¦‹ãŸã‚«ãƒ¡ãƒ©ã®æ–¹å‘
+	float cameraAngle = DX_PI_F;
+	float cameraAngleY = 0.5f;
+	float cameraVecX = 0.0f;
+	float cameraVecY = 0.0f;
+
+
+
+	// ä¸­å¿ƒã‹ã‚‰è¦‹ãŸã‚«ãƒ¡ãƒ©ã®æ–¹å‘
+	float cameraAngleAxisX = 0.0f;
+	float cameraAngleAxisY = 0.0f;
+
+
+
+	// è¦–é‡è§’
+	float pers = 60.0f;
+
+
+
+	int texture = LoadGraph("data/img/texture01.png");
+
+
+
+	while (ProcessMessage() == 0)
+	{
+		LONGLONG time = GetNowHiPerformanceCount();
+		// ç”»é¢ã®ã‚¯ãƒªã‚¢
+		ClearDrawScreen();
+
+
+
+		int key = GetJoypadInputState(DX_INPUT_KEY_PAD1);
+		if (key & PAD_INPUT_UP)
+		{
+			//spherePos.z += 10.0f;
+			//cameraAngleY += 0.05f;
+			cameraAngleAxisX += 0.01f;
+		}
+		if (key & PAD_INPUT_DOWN)
+		{
+			//spherePos.z -= 10.0f;
+			//cameraAngleY -= 0.05f;
+			cameraAngleAxisX -= 0.01f;
+		}
+		if (key & PAD_INPUT_RIGHT)
+		{
+			//pers -= 1.0f;
+			//spherePos.x += 10.0f;
+			//cameraAngle -= 0.05f;
+			cameraAngleAxisY -= 0.01f;
+		}
+		if (key & PAD_INPUT_LEFT)
+		{
+			//pers += 1.0f;
+			//spherePos.x -= 10.0f;
+			//cameraAngle += 0.05f;
+			cameraAngleAxisY += 0.01f;
+		}
+
+
+
+		if (CheckHitKey(KEY_INPUT_W))
+		{
+			spherePos.z += 10.0f;
+		}
+		if (CheckHitKey(KEY_INPUT_S))
+		{
+			spherePos.z -= 10.0f;
+		}
+		if (CheckHitKey(KEY_INPUT_D))
+		{
+			//pers -= 1.0f;
+			spherePos.x += 10.0f;
+		}
+		if (CheckHitKey(KEY_INPUT_A))
+		{
+			//pers += 1.0f;
+			spherePos.x -= 10.0f;
+		}
+		// ã‚«ãƒ¡ãƒ©ãƒªã‚»ãƒƒãƒˆ
+		if (CheckHitKey(KEY_INPUT_R))
+		{
+			/*cameraAngle = DX_PI_F;
+			cameraAngleY = 0.5f;*/
+			if (cameraAngle <= DX_PI_F)
+			{
+				cameraVecX = 0.1f;
+			}
+			else if (cameraAngle >= DX_PI_F)
+			{
+				cameraVecX = -0.1f;
+			}
+			if (cameraAngleY <= 0.5f)
+			{
+				cameraVecY = 0.05f;
+			}
+			else if (cameraAngleY >= 0.5f)
+			{
+				cameraVecY = -0.05f;
+			}
+		}
+
+
+
+		if (cameraAngleY >= 1.5f)
+		{
+			cameraAngleY = 1.5f;
+		}
+		if (cameraAngleY <= 0.1f)
+		{
+			cameraAngleY = 0.1f;
+		}
+		if (cameraVecX != 0 || cameraVecY != 0)
+		{
+			if (cameraAngle >= 3.0f && cameraAngle <= 3.2f)
+			{
+				cameraVecX = 0;
+				cameraAngle = DX_PI_F;
+			}
+			if (cameraAngleY >= 0.5f && cameraAngleY <= 0.6f)
+			{
+				cameraVecY = 0;
+				cameraAngleY = 0.5f;
+			}
+		}
+
+
+
+
+		cameraAngle += cameraVecX;
+		cameraAngleY += cameraVecY;
+		if (cameraAngle >= 3.8f)
+		{
+			cameraAngle = 3.8f;
+		}
+		if (cameraAngle <= 2.48f)
+		{
+			cameraAngle = 2.48f;
+		}
+
+
+
+		// è¦–é‡è§’ã‚’æ¯ãƒ•ãƒ¬ãƒ¼ãƒ å¤‰æ›´ã™ã‚‹
+		SetupCamera_Perspective(pers * DX_PI_F / 180.0f);
+		// ã‚«ãƒ¡ãƒ©ã®ä½ç½®
+		//VECTOR posCamera = VGet(spherePos.x, spherePos.y + 300.0f, spherePos.z - 1000.0f);
+		// ã‚«ãƒ¡ãƒ©ã®ã‚¿ãƒ¼ã‚²ãƒƒãƒˆä¸€ã‚’æ¯ãƒ•ãƒ¬ãƒ¼ãƒ å¤‰æ›´ã™ã‚‹
+		//SetCameraPositionAndTarget_UpVecY(/*posCamera*/VGet(0.0f, 300.0f, -1000.0f), VGet(0.0f, 0.0f, 0.0f));
+#if false
+		VECTOR cameraPos = VGet(0.0f, 300.0f, 0.0f);
+		cameraPos.x = sinf(cameraAngle) * kCameraDistance;
+		cameraPos.y = sinf(cameraAngleY) * kCameraDistance;
+		//cameraPos.y = sinf(cameraAngle) * kCameraDistance;
+		//cameraPos.z = sinf(cameraAngle) * kCameraDistance;
+		//cameraPos.x = cosf(cameraAngle) * kCameraDistance;
+		//cameraPos.y = cosf(cameraAngle) * kCameraDistance;
+		cameraPos.z = cosf(cameraAngle) * kCameraDistance;
+		//cameraPos.x = cosf(cameraAngleY) * kCameraDistance;
+
+		//SetCameraPositionAndTarget_UpVecY(cameraPos, VGet(0.0f, 0.0f, 0.0f));
+
+
+
+		SetCameraPositionAndTarget_UpVecY(VGet(cameraPos.x + spherePos.x, cameraPos.y + spherePos.y, cameraPos.z + spherePos.z), spherePos);
+#else
+		VECTOR cameraPos = VGet(0.0f, 300.0f, -800.0f);// ã‚«ãƒ¡ãƒ©åˆæœŸä½ç½®
+		//MATRIX mtx = MGetRotY(cameraAngle);
+		MATRIX mtxAixsX = MGetRotX(cameraAngleAxisX);
+		MATRIX mtxAixsY = MGetRotY(cameraAngleAxisY);
+		MATRIX mtx = MMult(mtxAixsX, mtxAixsY);
+		cameraPos = VTransform(cameraPos, mtx);
+		SetCameraPositionAndTarget_UpVecY(cameraPos, VGet(0.0f, 0.0f, 0.0f));
+#endif
+
+
+
+		// ã‚°ãƒªãƒƒãƒ‰ã‚’è¡¨ç¤º
+		DrawGrid();
+
+
+
+		// ãƒãƒªã‚´ãƒ³ã®è¡¨ç¤º
+		DrawMapPolygon(VGet(0.0f, 0.0f, 0.0f), 200.0f, texture);
+		DrawMapPolygon(VGet(-200.0f, 0.0f, 0.0f), 200.0f, texture);
+		DrawMapPolygon(VGet(0.0f, 0.0f, -200.0f), 200.0f, texture);
+
+
+
+		// åŸç‚¹ã«çƒã‚’è¡¨ç¤ºã™ã‚‹
+		DrawSphere3D(spherePos, 100.0f, 32, 0xffffff, 0xffffff, true);
+		// ç¾åœ¨ã®è¦–é‡è§’ã‚’ãƒ‡ãƒãƒƒã‚°è¡¨ç¤º
+		DrawFormatString(0, 0, 0xffffff, "pers = %f", pers);
+		DrawFormatString(0, 20, 0xffffff, "cameraAngle = %f", cameraAngle);
+		DrawFormatString(0, 40, 0xffffff, "cameraAngleY = %f", cameraAngleY);
+		DrawFormatString(0, 60, 0xffffff, "spherePos.x = %f", spherePos.x);
+		DrawFormatString(0, 80, 0xffffff, "spherePos.y = %f", spherePos.y);
+		DrawFormatString(0, 100, 0xffffff, "spherePos.z = %f", spherePos.z);
+		DrawFormatString(0, 140, 0xffffff, "cameraVecX = %f", cameraVecX);
+		DrawFormatString(0, 160, 0xffffff, "cameraVecY = %f", cameraVecY);
+
+
+
+		COLOR_F ambColor = GetLightAmbColor();
+		DrawFormatString(0, 120, 0xffffff, "amb = (%.4f, %.4f, %.4f, %.4f)",
+			ambColor.r,
+			ambColor.g,
+			ambColor.b,
+			ambColor.a);
+
+
+
+		DrawFormatString(0, 100, 0xffffff, "spherePos.z = %f", spherePos.z);
+
+
+
+		// è£ç”»é¢ã‚’è¡¨ç”»é¢ã‚’å…¥ã‚Œæ›¿ãˆã‚‹
+		ScreenFlip();
+
+
+
+		// escããƒ¼ã‚’æŠ¼ã—ãŸã‚‰çµ‚äº†ã™ã‚‹
+		if (CheckHitKey(KEY_INPUT_ESCAPE)) break;
+		// fpsã‚’60ã«å›ºå®š
+		while (GetNowHiPerformanceCount() - time < 16667)
+		{
+		}
+	}
+
+
+
+	DeleteGraph(texture);
+
+
+
+	DxLib_End();// ï¼¤ï¼¸ãƒ©ã‚¤ãƒ–ãƒ©ãƒªä½¿ç”¨ã®çµ‚äº†å‡¦ç†
+
+
+
+	return 0;// ã‚½ãƒ•ãƒˆã®çµ‚äº†Â 
+}
+
+
+#endif

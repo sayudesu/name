@@ -15,6 +15,8 @@ void Map::Init()
 {
 	//マップ画像メモリ読み込み
 	m_hMap = my::MyLoadGraph("Data/Image/Map/Hills Layer 05.png");
+	//TestMapChip.ppj
+	m_hMap = my::MyLoadGraph("Data/Image/Map/TestMapChip.fmf");
 }
 
 void Map::End()
@@ -30,5 +32,5 @@ void Map::Update()
 void Map::Draw(int x)
 {
 	//マップを描画
-	my::MyDrawExtendGraph(-10000 + x, 0, Game::kScreenWidth + 10000 + x, Game::kScreenHeight, m_hMap, false);
+	my::MyDrawExtendGraph(0 + x, 0, Game::kScreenWidth + 0 + x, Game::kScreenHeight, m_hMap, false);
 }
